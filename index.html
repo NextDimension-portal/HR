@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRMS Desktop</title>
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div class="auth-overlay active" id="auth-screen">
+        <div class="auth-card card">
+            <div class="app-logo auth-logo">
+                <img src="logo.png" alt="Next Dimension Logo" />
+            </div>
+            <h2 id="auth-title" data-i18n="login_title">تسجيل الدخول</h2>
+            
+            <form id="login-form" class="modern-form">
+                <div class="form-group">
+                    <label data-i18n="form_username">اسم المستخدم (أو الإيميل)</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form_password">الرقم السري</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn-primary w-100" data-i18n="btn_login">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-container" style="display: none;" id="main-app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <img src="logo.png" alt="Next Dimension Logo" />
+                </div>
+                <h2 data-i18n="app_title">نظام الموارد البشرية</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-target="dashboard">
+                    <span class="icon">🏠</span>
+                    <span data-i18n="nav_dashboard">الرئيسية</span>
+                </button>
+                <button class="nav-btn" data-target="requests">
+                    <span class="icon">📥</span>
+                    <span data-i18n="nav_requests">الطلبات</span>
+                </button>
+                <button class="nav-btn" data-target="employees">
+                    <span class="icon">👥</span>
+                    <span data-i18n="nav_employees">الموظفين</span>
+                </button>
+                <button class="nav-btn" data-target="government">
+                    <span class="icon">🏛️</span>
+                    <span data-i18n="nav_government">العلاقات الحكومية</span>
+                </button>
+                <button class="nav-btn" data-target="leaves">
+                    <span class="icon">📅</span>
+                    <span data-i18n="nav_leaves">الحضور والإجازات</span>
+                </button>
+                <button class="nav-btn" data-target="payroll">
+                    <span class="icon">💰</span>
+                    <span data-i18n="nav_payroll">مسير الرواتب</span>
+                </button>
+                <button class="nav-btn" data-target="reports">
+                    <span class="icon">📊</span>
+                    <span data-i18n="nav_reports">التقارير</span>
+                </button>
+                <button class="nav-btn" data-target="settings" id="nav-settings">
+                    <span class="icon">⚙️</span>
+                    <span data-i18n="nav_settings">الإعدادات</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="lang-toggle" class="btn-secondary" data-i18n="toggle_lang">English</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="page-title" data-i18n="nav_dashboard">لوحة القيادة</h1>
+                <div class="topbar-actions">
+                    <div class="user-profile">
+                        <div class="avatar-squircle" id="user-avatar">م</div>
+                        <div class="user-info">
+                            <span class="user-name" id="user-name-display">مرحباً بك</span>
+                            <span class="user-role" id="user-role-display">مدير النظام</span>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="btn-logout" data-i18n="btn_logout">تسجيل الخروج</button>
+                </div>
+            </header>
+
+            <div class="content-area active" id="content-dashboard">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-info">
+                            <h3 data-i18n="total_employees">إجمالي الموظفين</h3>
+                            <div class="kpi-value" id="kpi-employees-count">0</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-info">
+                            <h3 data-i18n="payroll_status">الرواتب (هذا الشهر)</h3>
+                            <div class="kpi-value text-success" data-i18n="ready">جاهز للاعتماد</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                    <div class="card" style="margin-bottom: 0;">
+                        <h3 data-i18n="chart_salary_title">تحليل الرواتب (شهرياً)</h3>
+                        <div style="height: 300px; width: 100%; position: relative;">
+                            <canvas id="salaryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <h3 data-i18n="chart_emp_title">توزيع الموظفين حسب القسم</h3>
+                        <div style="height: 300px; width: 100%; position: relative;">
+                            <canvas id="deptChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-employees">
+                <div class="actions-bar">
+                    <button class="btn-primary" id="btn-add-employee">
+                        <span class="icon">+</span> <span data-i18n="add_employee">إضافة موظف</span>
+                    </button>
+                    <input type="text" class="search-input" data-i18n-placeholder="search_employee" placeholder="بحث عن موظف...">
+                </div>
+                <div class="card table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="table_name">الاسم</th>
+                                <th data-i18n="table_role">الوظيفة</th>
+                                <th data-i18n="table_department">القسم</th>
+                                <th data-i18n="form_permission">الصلاحية</th>
+                                <th data-i18n="form_manager">المدير المباشر</th>
+                                <th data-i18n="table_status">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employee-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-positions">
+                <div class="card table-card">
+                    <div style="padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 data-i18n="nav_positions" style="margin: 0;">المناصب الوظيفية</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="form_role">المنصب الوظيفي</th>
+                                <th data-i18n="employee_count">عدد الموظفين</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-payroll">
+                <div class="actions-bar">
+                    <button class="btn-primary" id="btn-generate-sif">
+                        <span class="icon">📄</span> <span data-i18n="generate_sif">تصدير ملف WPS (SIF)</span>
+                    </button>
+                </div>
+                <div class="card table-card">
+                    <div style="padding: 24px;">
+                        <h3 data-i18n="payroll_overview">نظرة عامة على الرواتب</h3>
+                        <p data-i18n="payroll_desc" class="text-muted">محرك الرواتب متصل بقاعدة بيانات لحساب الراتب الأساسي والبدلات.</p>
+                    </div>
+                    <div class="payroll-table-container" style="width: 100%; overflow-x: auto;">
+                        <table class="data-table payroll-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="table_name">الاسم</th>
+                                    <th>1</th>
+                                    <th>2</th>
+                                    <th>3</th>
+                                    <th>4</th>
+                                    <th>5</th>
+                                    <th>6</th>
+                                    <th>7</th>
+                                    <th>8</th>
+                                    <th>9</th>
+                                    <th>10</th>
+                                    <th>11</th>
+                                    <th>12</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payroll-list">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-requests">
+                <div class="card">
+                    <h3 data-i18n="nav_requests">الطلبات</h3>
+                    <p class="text-muted">قريباً: إدارة جميع الطلبات الداخلية.</p>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-government">
+                <div class="card">
+                    <h3 data-i18n="nav_government">العلاقات الحكومية</h3>
+                    <p class="text-muted">قريباً: إدارة تجديد الإقامات والتأشيرات والتصاريح.</p>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-reports">
+                <div class="card">
+                    <h3 data-i18n="nav_reports">التقارير</h3>
+                    <p class="text-muted">قريباً: عرض وتحليل تقارير الموارد البشرية.</p>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-leaves">
+                 <div class="actions-bar">
+                    <button class="btn-primary">
+                        <span class="icon">+</span> <span data-i18n="request_leave">طلب إجازة</span>
+                    </button>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="leaves_overview">موافقات الإجازات</h3>
+                    <p data-i18n="leaves_desc" class="text-muted">نظام إدارة الإجازات سير العمل والاعتمادات.</p>
+                </div>
+            </div>
+
+            <div class="content-area" id="content-settings">
+                
+                <!-- Personal Settings (All Users) -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div style="padding: 24px;">
+                        <h3 style="margin-bottom: 24px; font-size: 24px; font-weight: 800;">إعدادات حسابي</h3>
+                        <form id="personal-settings-form" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin: 0;">
+                                <label>تغيير صورة البروفايل (رابط الصورة)</label>
+                                <input type="url" id="my-profile-pic" class="search-input" style="width: 100%;" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin: 0;">
+                                <label>تغيير الرقم السري</label>
+                                <input type="password" id="my-new-password" class="search-input" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <button type="submit" class="btn-primary" style="padding: 10px 24px; height: 42px;">حفظ التعديلات</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Admin Settings -->
+                <div id="admin-settings-container">
+                    <div class="card table-card" style="margin-bottom: 24px;">
+                    <div style="padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 data-i18n="settings_departments" style="margin: 0;">الهيكل الإداري والأقسام</h3>
+                        <form id="dept-form" style="display: flex; gap: 8px;">
+                            <input type="text" id="new-dept-name" required data-i18n-placeholder="form_dept_name" class="search-input" style="width: 200px; padding: 8px 16px;">
+                            <button type="submit" class="btn-primary" style="padding: 8px 16px;" data-i18n="add_department">إضافة قسم</button>
+                        </form>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="form_dept_name">اسم القسم</th>
+                                <th data-i18n="table_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dept-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card table-card">
+                    <div style="padding: 24px;">
+                        <h3 data-i18n="settings_employees" style="margin: 0;">إدارة صلاحيات الموظفين</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="table_name">الاسم</th>
+                                <th data-i18n="form_permission">الصلاحية</th>
+                                <th data-i18n="table_actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="settings-employee-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- System Configuration Settings -->
+                <div class="card" style="margin-top: 24px;">
+                    <div style="padding: 24px;">
+                        <h3 data-i18n="system_configuration" style="margin-bottom: 24px; font-size: 24px; font-weight: 800;">إعدادات النظام بالكامل</h3>
+                        <p class="text-muted" style="margin-bottom: 24px;">يمكنك هنا تفعيل أو تعطيل ميزات الواجهة وإخفاء الأزرار.</p>
+                        <div class="form-grid">
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" id="cfg-payroll" style="width:24px;height:24px;">
+                                <label style="margin:0; font-size: 18px;">إظهار نظام الرواتب</label>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" id="cfg-leaves" style="width:24px;height:24px;">
+                                <label style="margin:0; font-size: 18px;">إظهار نظام الإجازات</label>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" id="cfg-add-emp" style="width:24px;height:24px;">
+                                <label style="margin:0; font-size: 18px;">إظهار زر إضافة موظف</label>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" id="cfg-export" style="width:24px;height:24px;">
+                                <label style="margin:0; font-size: 18px;">إظهار زر تصدير SIF</label>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                                <input type="checkbox" id="cfg-dashboard-kpi" style="width:24px;height:24px;">
+                                <label style="margin:0; font-size: 18px;">إظهار إحصائيات لوحة القيادة</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Account Management -->
+                <div class="card" style="margin-top: 24px;">
+                    <div style="padding: 24px;">
+                        <h3 style="margin-bottom: 24px; font-size: 24px; font-weight: 800;">إدارة حسابات النظام</h3>
+                        <p class="text-muted" style="margin-bottom: 24px;">إنشاء حسابات دخول للموظفين وإدارة صلاحياتهم.</p>
+                        
+                        <form id="create-user-form" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-end; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 150px; margin: 0;">
+                                <label>اسم الموظف / الحساب</label>
+                                <input type="text" id="new-user-name" required class="search-input" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 150px; margin: 0;">
+                                <label>اسم المستخدم (للدخول)</label>
+                                <input type="text" id="new-user-username" required class="search-input" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 150px; margin: 0;">
+                                <label>الرقم السري</label>
+                                <input type="password" id="new-user-password" required class="search-input" style="width: 100%;">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 150px; margin: 0;">
+                                <label>الصلاحية</label>
+                                <select id="new-user-role" class="search-input" style="width: 100%;">
+                                    <option value="admin">مسؤول (Admin)</option>
+                                    <option value="manager">مدير قسم (Manager)</option>
+                                    <option value="employee">موظف (Employee)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary" style="padding: 10px 24px; height: 42px;">إنشاء الحساب</button>
+                        </form>
+
+                        <div class="table-card">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>اسم المستخدم</th>
+                                        <th>الصلاحية</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </div> <!-- End Admin Settings -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Employee Modal -->
+    <div class="modal-overlay" id="employee-modal">
+        <div class="modal-card">
+            <h2 data-i18n="add_employee">إضافة موظف</h2>
+            <form id="employee-form" class="modern-form">
+                <div class="form-group">
+                    <label data-i18n="form_name">اسم الموظف</label>
+                    <input type="text" id="emp-name" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form_role">المسمى الوظيفي</label>
+                    <input type="text" id="emp-role" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form_department">القسم</label>
+                    <select id="emp-dept">
+                        <!-- Populated dynamically via JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form_permission">الصلاحية</label>
+                    <select id="emp-permission">
+                        <option value="admin" data-i18n="perm_admin">مسؤول نظام (HR)</option>
+                        <option value="manager" data-i18n="perm_manager">مدير قسم</option>
+                        <option value="employee" data-i18n="perm_employee">موظف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form_manager">المدير المباشر</label>
+                    <select id="emp-manager">
+                        <!-- Populated via JS -->
+                        <option value="" data-i18n="no_manager">بدون مدير</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="btn-close-modal" data-i18n="btn_cancel">إلغاء</button>
+                    <button type="submit" class="btn-primary" data-i18n="btn_save">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employee Details Full Modal -->
+    <div class="modal-overlay" id="employee-details-modal">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <h2 id="details-emp-name" style="margin-bottom: 0; font-size: 24px;">اسم الموظف</h2>
+                <button type="button" class="btn-icon" id="btn-close-details" style="background: none; border: none; font-size: 32px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tab-work">العمل</button>
+                <button class="tab-btn" data-tab="tab-personal">شخصي</button>
+                <button class="tab-btn" data-tab="tab-address">العناوين والطوارئ</button>
+                <button class="tab-btn" data-tab="tab-family">عائلة وتعليم</button>
+                <button class="tab-btn" data-tab="tab-docs">مستندات</button>
+            </div>
+
+            <form id="employee-details-form" class="modern-form" style="max-height: 60vh; overflow-y: auto;">
+                <input type="hidden" id="detail-emp-id">
+                
+                <!-- Tab: Work -->
+                <div class="tab-content active" id="tab-work">
+                    <div class="form-grid">
+                        <div class="form-group"><label>تاريخ بدء العمل</label><input type="date" id="det-start-date" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>القسم</label><select id="det-department"></select></div>
+                        <div class="form-group"><label>المنصب الوظيفي</label><input type="text" id="det-role"></div>
+                        <div class="form-group"><label>المدير المباشر</label><select id="det-manager"></select></div>
+                        <div class="form-group"><label>عنوان العمل</label><input type="text" id="det-work-location"></div>
+                        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="det-email"></div>
+                        <div class="form-group"><label>رقم الهاتف</label><input type="text" id="det-phone"></div>
+                        <div class="form-group" style="grid-column: span 2;"><label>الحسابات البنكية</label><input type="text" id="det-bank"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Personal -->
+                <div class="tab-content" id="tab-personal">
+                    <div class="form-grid">
+                        <div class="form-group"><label>الاسم القانوني</label><input type="text" id="det-legal-name"></div>
+                        <div class="form-group"><label>الجنس</label><select id="det-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
+                        <div class="form-group"><label>يوم الميلاد</label><input type="date" id="det-birth-date" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>مكان الميلاد (المدينة - الدولة)</label><input type="text" id="det-birth-place"></div>
+                        <div class="form-group"><label>الجنسية</label><input type="text" id="det-nationality"></div>
+                        <div class="form-group"><label>رقم الهوية</label><input type="text" id="det-national-id"></div>
+                        <div class="form-group"><label>رقم جواز السفر</label><input type="text" id="det-passport"></div>
+                        <div class="form-group"><label>رقم التأشيرة</label><input type="text" id="det-visa"></div>
+                        <div class="form-group"><label>رقم تصريح العمل</label><input type="text" id="det-work-permit"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Address & Emergency -->
+                <div class="tab-content" id="tab-address">
+                    <h3 style="margin-bottom:16px;">العنوان الخاص</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>الشارع</label><input type="text" id="det-street1"></div>
+                        <div class="form-group"><label>الشارع 2</label><input type="text" id="det-street2"></div>
+                        <div class="form-group"><label>المدينة</label><input type="text" id="det-city"></div>
+                        <div class="form-group"><label>الولاية / المنطقة</label><input type="text" id="det-state"></div>
+                        <div class="form-group"><label>الدولة</label><input type="text" id="det-country"></div>
+                        <div class="form-group"><label>الرمز البريدي</label><input type="text" id="det-zip"></div>
+                        <div class="form-group"><label>المسافة للعمل (كم)</label><input type="number" id="det-distance" class="search-input" style="width: 100%;"></div>
+                    </div>
+                    <hr style="margin: 24px 0; border: 0; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom:16px;">طوارئ</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>اسم جهة الاتصال</label><input type="text" id="det-em-name"></div>
+                        <div class="form-group"><label>رقم الهاتف</label><input type="text" id="det-em-phone"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Family & Education -->
+                <div class="tab-content" id="tab-family">
+                    <div class="form-grid">
+                        <div class="form-group"><label>الحالة الاجتماعية</label><select id="det-marital"><option value="single">أعزب</option><option value="married">متزوج</option></select></div>
+                        <div class="form-group"><label>الأطفال المعالون</label><input type="number" id="det-children" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>مستوى الشهادة التعليمية</label><input type="text" id="det-education-level"></div>
+                        <div class="form-group"><label>مجال الدراسة</label><input type="text" id="det-education-field"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Documents -->
+                <div class="tab-content" id="tab-docs">
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>نسخة من بطاقة الهوية (رفع ملف)</label>
+                            <input type="file" id="det-file-id" class="search-input" style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>رخصة القيادة (رفع ملف)</label>
+                            <input type="file" id="det-file-license" class="search-input" style="width:100%; padding: 8px;">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>مستند تصريح العمل (رفع ملف)</label>
+                            <input type="file" id="det-file-work" class="search-input" style="width:100%; padding: 8px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 24px;">
+                    <button type="button" class="btn-secondary" id="btn-cancel-details">إلغاء</button>
+                    <button type="submit" class="btn-primary">حفظ التفاصيل</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
