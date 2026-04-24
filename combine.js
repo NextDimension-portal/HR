@@ -18,8 +18,10 @@ ${appJs}
 </script>
 `;
 
-// Replace everything from <script src="js/i18n.js"> to the end of the body
-const newIndexHtml = indexHtml.replace(/<script src="js\/i18n\.js"><\/script>[\s\S]*?<\/body>/, combinedScripts + '</body>');
+// This regex matches either the separate script tags OR the already combined script block
+const regex = /(<script src="js\/i18n\.js"><\/script>|<script>\s*\/\/\s*---\s*i18n\.js\s*---)[\s\S]*?<\/body>/;
+
+const newIndexHtml = indexHtml.replace(regex, combinedScripts + '</body>');
 
 fs.writeFileSync('index.html', newIndexHtml, 'utf8');
 console.log('Successfully combined JS into index.html');

@@ -83,7 +83,7 @@
 
         <main class="main-content">
             <header class="topbar">
-                <h1 id="page-title" data-i18n="nav_dashboard">لوحة القيادة</h1>
+                <h1 id="page-title" data-i18n="nav_dashboard">لوحة القيادة (النسخة المحدثة)</h1>
                 <div class="topbar-actions">
                     <div class="user-profile">
                         <div class="avatar-squircle" id="user-avatar">م</div>
@@ -229,8 +229,23 @@
 
             <div class="content-area" id="content-reports">
                 <div class="card">
-                    <h3 data-i18n="nav_reports">التقارير</h3>
-                    <p class="text-muted">قريباً: عرض وتحليل تقارير الموارد البشرية.</p>
+                    <h3 data-i18n="nav_reports">التقارير (مسيرات الرواتب الخاصة بي)</h3>
+                    <p class="text-muted">يمكنك هنا استعراض وطباعة قسائم الرواتب (Payslips) الخاصة بك والتي تم صرفها.</p>
+                    
+                    <div style="margin-top: 24px;">
+                        <table class="table w-100">
+                            <thead>
+                                <tr>
+                                    <th>الشهر</th>
+                                    <th>حالة الصرف</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-reports-list">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -432,6 +447,65 @@
         </div>
     </div>
 
+    <!-- Payslip Modal -->
+    <div class="modal-overlay" id="payslip-modal">
+        <div class="modal-card modal-large" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 style="margin-bottom: 0; font-size: 24px;">مسير راتب (Payslip)</h2>
+                <button type="button" class="btn-icon" onclick="document.getElementById('payslip-modal').classList.remove('active')" style="background: none; border: none; font-size: 32px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div id="payslip-print-area" style="padding: 24px; border: 1px solid var(--border-color); border-radius: 12px; margin-top: 16px; background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 16px; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="color: var(--primary-color); margin: 0; font-weight: 900;">HR SYSTEM V2</h1>
+                        <p style="margin: 4px 0 0 0; color: var(--text-muted);">شركة الموارد البشرية</p>
+                    </div>
+                    <div style="text-align: left;">
+                        <h2 style="margin: 0;">قسيمة راتب</h2>
+                        <h3 style="margin: 4px 0 0 0; color: var(--text-muted);" id="slip-month">الشهر</h3>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 16px; border-radius: 8px;">
+                    <div><strong>اسم الموظف: </strong> <span id="slip-name"></span></div>
+                    <div><strong>القسم: </strong> <span id="slip-dept"></span></div>
+                    <div><strong>تاريخ المباشرة: </strong> <span id="slip-start"></span></div>
+                    <div><strong>أيام العمل المحتسبة: </strong> <span id="slip-days">30</span> يوم</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div>
+                        <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">الاستحقاقات (Earnings)</h3>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>الراتب الأساسي</span><strong id="slip-basic">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>بدل السكن</span><strong id="slip-housing">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>بدل النقل</span><strong id="slip-transport">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                            <strong>إجمالي الاستحقاقات</strong><strong id="slip-total-earnings" style="color: #10b981;">0</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">الاستقطاعات (Deductions)</h3>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>التأمينات الاجتماعية (GOSI)</span><strong id="slip-gosi">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>أخرى / غياب</span><strong id="slip-other-deductions">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                            <strong>إجمالي الاستقطاعات</strong><strong id="slip-total-deductions" style="color: #ef4444;">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; background: rgba(14, 165, 233, 0.1); padding: 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; color: var(--primary-color);">صافي الراتب (Net Pay)</h2>
+                    <h1 style="margin: 0; color: var(--primary-color);" id="slip-net">0 ر.س</h1>
+                </div>
+            </div>
+            
+            <div class="form-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-primary" onclick="window.downloadPayslipPDF()" style="background: #ef4444;"><i class="fas fa-file-pdf"></i> تحميل PDF</button>
+                <button type="button" class="btn-primary" onclick="window.printPayslip()"><i class="fas fa-print"></i> طباعة (Print V2)</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Employee Details Full Modal -->
     <div class="modal-overlay" id="employee-details-modal">
         <div class="modal-card modal-large">
@@ -442,6 +516,7 @@
             
             <div class="tabs">
                 <button class="tab-btn active" data-tab="tab-work">العمل</button>
+                <button class="tab-btn" data-tab="tab-salary">الراتب</button>
                 <button class="tab-btn" data-tab="tab-personal">شخصي</button>
                 <button class="tab-btn" data-tab="tab-address">العناوين والطوارئ</button>
                 <button class="tab-btn" data-tab="tab-family">عائلة وتعليم</button>
@@ -462,6 +537,16 @@
                         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="det-email"></div>
                         <div class="form-group"><label>رقم الهاتف</label><input type="text" id="det-phone"></div>
                         <div class="form-group" style="grid-column: span 2;"><label>الحسابات البنكية</label><input type="text" id="det-bank"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Salary -->
+                <div class="tab-content" id="tab-salary">
+                    <div class="form-grid">
+                        <div class="form-group"><label>الراتب الأساسي (ريال)</label><input type="number" id="det-basic-salary" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>بدل السكن (ريال)</label><input type="number" id="det-housing-allowance" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>بدل النقل (ريال)</label><input type="number" id="det-transport-allowance" class="search-input" style="width: 100%;"></div>
+                        <div class="form-group"><label>خصم التأمينات GOSI (%)</label><input type="number" step="0.1" id="det-gosi-percentage" class="search-input" style="width: 100%;" value="9.75"></div>
                     </div>
                 </div>
 
@@ -537,7 +622,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
+
+
+
 <script>
 // --- i18n.js ---
 const translations = {
@@ -1289,7 +1378,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const isPaid = emp.paidMonths && emp.paidMonths.includes(monthStr);
                         if (isPaid) {
                             html += `<td style="text-align: center;">
-                                <button onclick="window.togglePayroll(${emp.id}, '${monthStr}')" class="btn-secondary" style="padding: 4px; font-size: 12px; min-width: 32px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;" title="${getTranslation('mark_unpaid')}">✔️</button>
+                                <div style="display:flex; justify-content:center; gap:4px; align-items:center;">
+                                    <button onclick="window.togglePayroll(${emp.id}, '${monthStr}')" class="btn-secondary" style="padding: 4px; font-size: 12px; min-width: 32px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;" title="${getTranslation('mark_unpaid')}">✔️</button>
+                                    <button onclick="window.showPayslip(${emp.id}, '${monthStr}')" class="btn-primary" style="padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer;">مسير</button>
+                                </div>
                             </td>`;
                         } else {
                             html += `<td style="text-align: center;">
@@ -1338,6 +1430,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     usersList.appendChild(tr);
                 }
             });
+        }
+
+        // Update My Reports (Employee Payslips)
+        const myReportsList = document.getElementById('my-reports-list');
+        if (myReportsList && currentUser) {
+            myReportsList.innerHTML = '';
+            
+            // Re-fetch current user to get fresh data
+            const myEmp = employees.find(e => e.id === currentUser.id);
+            if (myEmp && myEmp.paidMonths && myEmp.paidMonths.length > 0) {
+                // Sort months descending
+                const sortedMonths = [...myEmp.paidMonths].sort((a, b) => b.localeCompare(a));
+                
+                sortedMonths.forEach(monthStr => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${monthStr}</strong></td>
+                        <td><span class="status-badge status-active" style="background: #10b981; color: white;">تم الصرف</span></td>
+                        <td>
+                            <button onclick="window.showPayslip(${myEmp.id}, '${monthStr}')" class="btn-primary" style="padding: 6px 12px; border-radius: 6px;"><i class="fas fa-file-invoice"></i> عرض المسير</button>
+                        </td>
+                    `;
+                    myReportsList.appendChild(tr);
+                });
+            } else {
+                myReportsList.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">لا توجد مسيرات رواتب مصدرة لك حتى الآن.</td></tr>`;
+            }
         }
 
         // Update Charts
@@ -1444,6 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global action handlers for settings
     window.togglePayroll = function(id, month) {
         db.togglePayroll(id, month);
+        db.notify();
     };
 
     window.deleteEmp = function(id) {
@@ -1553,7 +1673,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Populate Fields
-            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField'];
+            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField', 'basicSalary', 'housingAllowance', 'transportAllowance', 'gosiPercentage'];
             fields.forEach(f => {
                 const el = document.getElementById('det-' + f.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`));
                 if (el) el.value = emp[f] || '';
@@ -1569,7 +1689,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const empId = document.getElementById('detail-emp-id').value;
             const details = {};
-            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField'];
+            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField', 'basicSalary', 'housingAllowance', 'transportAllowance', 'gosiPercentage'];
             
             details.department = document.getElementById('det-department').value;
             details.managerId = document.getElementById('det-manager').value || null;
@@ -1604,6 +1724,83 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Payslip Logic
+    window.showPayslip = function(empId, monthStr) {
+        const emp = db.getEmployees().find(e => e.id == empId);
+        if (!emp) return;
+
+        const basic = parseFloat(emp.basicSalary) || 0;
+        const housing = parseFloat(emp.housingAllowance) || 0;
+        const transport = parseFloat(emp.transportAllowance) || 0;
+        const gosiPerc = parseFloat(emp.gosiPercentage) || 0; // default to 0 if not set
+        
+        let workedDays = 30; // standard month for Saudi labor law
+        
+        if (emp.startDate) {
+            const [y, m, d] = emp.startDate.split('-');
+            const startMonth = `${y}-${m}`;
+            if (startMonth === monthStr) {
+                workedDays = 30 - parseInt(d) + 1;
+                if (workedDays < 0) workedDays = 0;
+                if (workedDays > 30) workedDays = 30;
+            }
+        }
+
+        const ratio = workedDays / 30;
+        const pBasic = basic * ratio;
+        const pHousing = housing * ratio;
+        const pTransport = transport * ratio;
+        const totalEarnings = pBasic + pHousing + pTransport;
+        
+        const gosiDeduction = (pBasic + pHousing) * (gosiPerc / 100);
+        const totalDeductions = gosiDeduction;
+        const net = totalEarnings - totalDeductions;
+
+        document.getElementById('slip-month').textContent = monthStr;
+        document.getElementById('slip-name').textContent = currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name);
+        
+        const deptObj = db.getDepartments().find(d => d.id === emp.department);
+        document.getElementById('slip-dept').textContent = deptObj ? (currentLang === 'ar' ? deptObj.nameAr : deptObj.nameEn) : (emp.department || '-');
+        
+        document.getElementById('slip-start').textContent = emp.startDate || '-';
+        document.getElementById('slip-days').textContent = workedDays;
+
+        document.getElementById('slip-basic').textContent = pBasic.toFixed(2);
+        document.getElementById('slip-housing').textContent = pHousing.toFixed(2);
+        document.getElementById('slip-transport').textContent = pTransport.toFixed(2);
+        document.getElementById('slip-total-earnings').textContent = totalEarnings.toFixed(2);
+        
+        document.getElementById('slip-gosi').textContent = gosiDeduction.toFixed(2);
+        document.getElementById('slip-total-deductions').textContent = totalDeductions.toFixed(2);
+        document.getElementById('slip-net').textContent = net.toFixed(2) + ' ر.س';
+
+        document.getElementById('payslip-modal').classList.add('active');
+    };
+
+    window.printPayslip = function() {
+        const printContents = document.getElementById('payslip-print-area').innerHTML;
+        const originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        window.location.reload(); 
+    };
+
+    window.downloadPayslipPDF = function() {
+        const element = document.getElementById('payslip-print-area');
+        const empName = document.getElementById('slip-name').textContent;
+        const slipMonth = document.getElementById('slip-month').textContent;
+        const opt = {
+            margin:       10,
+            filename:     `Payslip_${empName}_${slipMonth}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    };
+
 });
 
 </script>
