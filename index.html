@@ -490,7 +490,7 @@
                     <div>
                         <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">الاستقطاعات (Deductions)</h3>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>التأمينات الاجتماعية (GOSI)</span><strong id="slip-gosi">0</strong></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>أخرى / غياب</span><strong id="slip-other-deductions">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>غياب (<span id="slip-absent-days-count">0</span> أيام)</span><strong id="slip-absent-deduction">0</strong></div>
                         <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
                             <strong>إجمالي الاستقطاعات</strong><strong id="slip-total-deductions" style="color: #ef4444;">0</strong>
                         </div>
@@ -624,6 +624,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
+
 
 
 
@@ -1562,6 +1563,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Global action handlers for settings
     window.togglePayroll = function(id, month) {
+        const emp = db.getEmployees().find(e => e.id == id);
+        if (emp) {
+            const isCurrentlyPaid = emp.paidMonths && emp.paidMonths.includes(month);
+            if (!isCurrentlyPaid) {
+                const input = prompt('أدخل عدد أيام الغياب ليتم خصمها من الراتب لهذا الشهر (ضع 0 إذا لم يوجد):', '0');
+                if (input === null) return; // Cancelled
+                
+                let absentDays = parseFloat(input) || 0;
+                if (!emp.absences) emp.absences = {};
+                emp.absences[month] = absentDays;
+            } else {
+                if (emp.absences) delete emp.absences[month];
+            }
+        }
         db.togglePayroll(id, month);
         db.notify();
     };
@@ -1747,14 +1762,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const ratio = workedDays / 30;
-        const pBasic = basic * ratio;
-        const pHousing = housing * ratio;
-        const pTransport = transport * ratio;
-        const totalEarnings = pBasic + pHousing + pTransport;
+        const absentDays = (emp.absences && emp.absences[monthStr]) || 0;
+        document.getElementById('slip-absent-days-count').textContent = absentDays;
+
+        let dailyRate = (basic + housing + transport) / 30;
+        if (isNaN(dailyRate)) dailyRate = 0;
         
-        const gosiDeduction = (pBasic + pHousing) * (gosiPerc / 100);
-        const totalDeductions = gosiDeduction;
+        let absentDeduction = dailyRate * absentDays;
+
+        workedDays = workedDays - absentDays;
+        if (workedDays < 0) workedDays = 0;
+
+        const ratio = workedDays / 30; // Not applying ratio here, applying fixed deduction instead
+        // Wait, standard Saudi law: full salary shown, deductions shown separately.
+        // We will show full basic/housing/transport, and subtract absentDeduction.
+        const pBasic = basic;
+        const pHousing = housing;
+        const pTransport = transport;
+        
+        // If they started mid-month, prorate the full earnings first
+        let prorateRatio = 1;
+        if (emp.startDate) {
+            const [y, m, d] = emp.startDate.split('-');
+            if (`${y}-${m}` === monthStr) {
+                let startDays = 30 - parseInt(d) + 1;
+                if (startDays < 0) startDays = 0;
+                if (startDays > 30) startDays = 30;
+                prorateRatio = startDays / 30;
+            }
+        }
+
+        const eBasic = pBasic * prorateRatio;
+        const eHousing = pHousing * prorateRatio;
+        const eTransport = pTransport * prorateRatio;
+        const totalEarnings = eBasic + eHousing + eTransport;
+        
+        const gosiDeduction = (eBasic + eHousing) * (gosiPerc / 100);
+        const totalDeductions = gosiDeduction + absentDeduction;
         const net = totalEarnings - totalDeductions;
 
         document.getElementById('slip-month').textContent = monthStr;
@@ -1766,12 +1810,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('slip-start').textContent = emp.startDate || '-';
         document.getElementById('slip-days').textContent = workedDays;
 
-        document.getElementById('slip-basic').textContent = pBasic.toFixed(2);
-        document.getElementById('slip-housing').textContent = pHousing.toFixed(2);
-        document.getElementById('slip-transport').textContent = pTransport.toFixed(2);
+        document.getElementById('slip-basic').textContent = eBasic.toFixed(2);
+        document.getElementById('slip-housing').textContent = eHousing.toFixed(2);
+        document.getElementById('slip-transport').textContent = eTransport.toFixed(2);
         document.getElementById('slip-total-earnings').textContent = totalEarnings.toFixed(2);
         
         document.getElementById('slip-gosi').textContent = gosiDeduction.toFixed(2);
+        document.getElementById('slip-absent-deduction').textContent = absentDeduction.toFixed(2);
         document.getElementById('slip-total-deductions').textContent = totalDeductions.toFixed(2);
         document.getElementById('slip-net').textContent = net.toFixed(2) + ' ر.س';
 
