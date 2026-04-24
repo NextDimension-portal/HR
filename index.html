@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
+    <script>
+        window.onerror = function(msg, url, line) {
+            alert("Error: " + msg + "\nLine: " + line);
+        };
+    </script>
     <!-- Auth Screen -->
     <div class="auth-overlay active" id="auth-screen">
         <div class="auth-card card">
