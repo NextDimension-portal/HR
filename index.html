@@ -537,8 +537,1075 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/app.js"></script>
+    
+<script>
+// --- i18n.js ---
+const translations = {
+    ar: {
+        app_title: "نظام الموارد البشرية",
+        nav_dashboard: "الرئيسية",
+        nav_employees: "الموظفين",
+        nav_payroll: "الرواتب والامتثال",
+        nav_leaves: "الإجازات والحضور",
+        toggle_lang: "English",
+        user_name: "أحمد محمد",
+        user_role: "مدير الموارد البشرية",
+        total_employees: "إجمالي الموظفين",
+        pending_leaves: "طلبات الإجازة المعلقة",
+        payroll_status: "الرواتب (هذا الشهر)",
+        ready: "جاهز للاعتماد",
+        recent_activity: "النشاط الأخير",
+        chart_salary_title: "تحليل الرواتب (شهرياً)",
+        chart_emp_title: "توزيع الموظفين حسب القسم",
+        add_employee: "إضافة موظف",
+        search_employee: "بحث عن موظف...",
+        table_name: "الاسم",
+        table_role: "الوظيفة",
+        table_department: "القسم",
+        table_status: "الحالة",
+        generate_sif: "تصدير ملف WPS (SIF)",
+        payroll_overview: "نظرة عامة على الرواتب",
+        payroll_desc: "محرك الرواتب متصل بقاعدة بيانات Realm لحساب الراتب الأساسي والبدلات والخصومات والتأمينات الاجتماعية.",
+        request_leave: "طلب إجازة",
+        leaves_overview: "موافقات الإجازات",
+        leaves_desc: "نظام إدارة الإجازات وسير العمل والاعتمادات.",
+        form_name: "اسم الموظف",
+        form_role: "المسمى الوظيفي",
+        form_department: "القسم",
+        dept_it: "تقنية المعلومات",
+        dept_hr: "الموارد البشرية",
+        dept_finance: "المالية",
+        dept_operations: "العمليات",
+        btn_cancel: "إلغاء",
+        btn_save: "حفظ",
+        status_active: "نشط",
+        activity_added: "تمت إضافة موظف جديد: ",
+        form_manager: "المدير المباشر",
+        form_permission: "الصلاحية",
+        perm_admin: "مسؤول نظام (HR)",
+        perm_manager: "مدير قسم",
+        perm_employee: "موظف",
+        no_manager: "بدون مدير",
+        login_title: "تسجيل الدخول",
+        register_title: "إنشاء حساب جديد",
+        form_username: "اسم المستخدم",
+        form_password: "الرقم السري",
+        btn_login: "دخول",
+        btn_register: "إنشاء حساب",
+        no_account: "ليس لديك حساب؟",
+        has_account: "لديك حساب بالفعل؟",
+        link_register: "سجل الآن",
+        link_login: "تسجيل الدخول",
+        btn_logout: "تسجيل الخروج",
+        login_error: "اسم المستخدم أو الرقم السري غير صحيح",
+        nav_settings: "الإعدادات والهيكل",
+        settings_employees: "إدارة صلاحيات الموظفين",
+        settings_departments: "الهيكل الإداري والأقسام",
+        btn_delete: "حذف",
+        btn_edit: "تعديل",
+        add_department: "إضافة قسم",
+        form_dept_name: "اسم القسم",
+        table_actions: "الإجراءات",
+        nav_positions: "المناصب الوظيفية",
+        employee_count: "عدد الموظفين",
+        table_month: "شهر الراتب",
+        status_paid: "تم الصرف",
+        status_unpaid: "لم يصرف",
+        mark_paid: "تأكيد الصرف",
+        mark_unpaid: "إلغاء الصرف"
+    },
+    en: {
+        app_title: "HR System",
+        nav_dashboard: "Home",
+        nav_employees: "Employees",
+        nav_payroll: "Payroll & Compliance",
+        nav_leaves: "Leaves & Attendance",
+        toggle_lang: "العربية",
+        user_name: "Ahmed Mohammed",
+        user_role: "HR Manager",
+        total_employees: "Total Employees",
+        pending_leaves: "Pending Leave Requests",
+        payroll_status: "Payroll (This Month)",
+        ready: "Ready for Approval",
+        recent_activity: "Recent Activity",
+        chart_salary_title: "Monthly Salary Analysis",
+        chart_emp_title: "Employees by Department",
+        add_employee: "Add Employee",
+        search_employee: "Search for employee...",
+        table_name: "Name",
+        table_role: "Role",
+        table_department: "Department",
+        table_status: "Status",
+        generate_sif: "Export WPS (SIF)",
+        payroll_overview: "Payroll Overview",
+        payroll_desc: "Payroll engine is connected to Realm DB to calculate basic salary, allowances, deductions, and GOSI.",
+        request_leave: "Request Leave",
+        leaves_overview: "Leave Approvals",
+        leaves_desc: "Leave management system, workflow, and approvals.",
+        form_name: "Employee Name",
+        form_role: "Job Title",
+        form_department: "Department",
+        dept_it: "IT",
+        dept_hr: "Human Resources",
+        dept_finance: "Finance",
+        dept_operations: "Operations",
+        btn_cancel: "Cancel",
+        btn_save: "Save",
+        status_active: "Active",
+        activity_added: "New employee added: ",
+        form_manager: "Direct Manager",
+        form_permission: "Role Permission",
+        perm_admin: "System Admin (HR)",
+        perm_manager: "Department Manager",
+        perm_employee: "Standard Employee",
+        no_manager: "No Manager",
+        login_title: "Login",
+        register_title: "Create Account",
+        form_username: "Username",
+        form_password: "Password",
+        btn_login: "Login",
+        btn_register: "Register",
+        no_account: "Don't have an account?",
+        has_account: "Already have an account?",
+        link_register: "Register Now",
+        link_login: "Login",
+        btn_logout: "Logout",
+        login_error: "Invalid username or password",
+        nav_settings: "Settings & Org Chart",
+        settings_employees: "Employee Permissions",
+        settings_departments: "Departments Structure",
+        btn_delete: "Delete",
+        btn_edit: "Edit",
+        add_department: "Add Department",
+        form_dept_name: "Department Name",
+        table_actions: "Actions",
+        nav_positions: "Job Positions",
+        employee_count: "Employee Count",
+        table_month: "Salary Month",
+        status_paid: "Paid",
+        status_unpaid: "Unpaid",
+        mark_paid: "Mark Paid",
+        mark_unpaid: "Mark Unpaid"
+    }
+};
+
+let currentLang = 'ar';
+
+function toggleLanguage() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    applyTranslations();
+}
+
+function applyTranslations() {
+    const texts = document.querySelectorAll('[data-i18n]');
+    texts.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+
+    const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+    placeholders.forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang][key]) {
+            el.placeholder = translations[currentLang][key];
+        }
+    });
+}
+
+function getTranslation(key) {
+    return translations[currentLang][key] || key;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyTranslations();
+    const langBtn = document.getElementById('lang-toggle');
+    if(langBtn) {
+        langBtn.addEventListener('click', toggleLanguage);
+    }
+});
+
+
+// --- db.js ---
+// Mocking Realm DB for Offline-first architecture until Electron/Node integration
+class LocalRealmDB {
+    constructor() {
+        let savedEmployees = null;
+        try {
+            const data = localStorage.getItem('hrms_employees');
+            if (data && data !== "undefined") {
+                savedEmployees = JSON.parse(data);
+            }
+        } catch(e) {
+            console.error("Local storage error:", e);
+        }
+        
+        // Auto-migrate if the old version without username exists
+        if (savedEmployees && savedEmployees.length > 0 && !savedEmployees[0].username) {
+            savedEmployees = null; // Force reset
+        }
+
+        this.employees = savedEmployees || [
+            { id: 1, username: 'admin', password: '123', name: 'سلطان المطيري', nameEn: 'Sultan Almutairi', role: 'HR Manager', departmentId: 'HR', status: 'active', permission: 'admin', managerId: null },
+            { id: 2, username: 'sara', password: '123', name: 'سارة خالد', nameEn: 'Sara Khaled', role: 'Accountant', departmentId: 'Finance', status: 'active', permission: 'manager', managerId: 1 },
+            { id: 3, username: 'ahmed', password: '123', name: 'أحمد علي', nameEn: 'Ahmed Ali', role: 'IT Support', departmentId: 'IT', status: 'active', permission: 'employee', managerId: 2 }
+        ];
+
+        // Ensure admin user always exists and reset password to 123
+        const adminIndex = this.employees.findIndex(e => e.username === 'admin');
+        if (adminIndex > -1) {
+            this.employees[adminIndex].password = '123';
+            this.employees[adminIndex].permission = 'admin';
+        } else {
+            this.employees.push({ id: Date.now(), username: 'admin', password: '123', name: 'مدير النظام', nameEn: 'System Admin', role: 'HR Manager', departmentId: 'HR', status: 'active', permission: 'admin', managerId: null });
+        }
+        
+        try {
+            const dData = localStorage.getItem('hrms_departments');
+            this.departments = (dData && dData !== "undefined") ? JSON.parse(dData) : [
+                { id: 'IT', nameAr: 'تقنية المعلومات', nameEn: 'IT' },
+                { id: 'HR', nameAr: 'الموارد البشرية', nameEn: 'Human Resources' },
+                { id: 'Finance', nameAr: 'المالية', nameEn: 'Finance' },
+                { id: 'Operations', nameAr: 'العمليات', nameEn: 'Operations' }
+            ];
+            
+            const aData = localStorage.getItem('hrms_activities');
+            this.activities = (aData && aData !== "undefined") ? JSON.parse(aData) : [
+                { id: 1, textAr: 'تحديث بيانات النظام', textEn: 'System data updated', time: new Date().toISOString() }
+            ];
+            
+            const cData = localStorage.getItem('hrms_config');
+            this.config = (cData && cData !== "undefined") ? JSON.parse(cData) : { payroll: true, leaves: true, addEmp: true, exportSif: true, dashboardKpi: true };
+        } catch(e) {
+            console.error(e);
+            this.departments = [];
+            this.activities = [];
+            this.config = { payroll: true, leaves: true, addEmp: true, exportSif: true, dashboardKpi: true };
+        }
+        this.listeners = [];
+    }
+
+    save() {
+        localStorage.setItem('hrms_employees', JSON.stringify(this.employees));
+        localStorage.setItem('hrms_activities', JSON.stringify(this.activities));
+        localStorage.setItem('hrms_departments', JSON.stringify(this.departments));
+        localStorage.setItem('hrms_config', JSON.stringify(this.config));
+        this.notify();
+    }
+
+    getDepartments() {
+        return this.departments;
+    }
+
+    addDepartment(dept) {
+        dept.id = 'dept_' + Date.now();
+        this.departments.push(dept);
+        this.addActivity({
+            textAr: 'تمت إضافة قسم جديد: ' + dept.nameAr,
+            textEn: 'New department added: ' + dept.nameEn
+        });
+        this.save();
+    }
+
+    deleteDepartment(id) {
+        this.departments = this.departments.filter(dept => dept.id !== id);
+        this.addActivity({
+            textAr: 'تم حذف قسم',
+            textEn: 'Department deleted'
+        });
+        this.save();
+    }
+
+    deleteEmployee(id) {
+        this.employees = this.employees.filter(emp => emp.id != id);
+        this.addActivity({
+            textAr: 'تم حذف موظف',
+            textEn: 'Employee deleted'
+        });
+        this.save();
+    }
+
+    updateEmployeePermission(id, newPermission) {
+        const emp = this.employees.find(e => e.id == id);
+        if (emp) {
+            emp.permission = newPermission;
+            this.addActivity({
+                textAr: 'تم تعديل صلاحية الموظف: ' + emp.name,
+                textEn: 'Permission updated for: ' + emp.nameEn
+            });
+            this.save();
+        }
+    }
+
+    updateEmployeeDetails(id, details) {
+        const empIndex = this.employees.findIndex(e => e.id == id);
+        if (empIndex > -1) {
+            this.employees[empIndex] = { ...this.employees[empIndex], ...details };
+            this.addActivity({
+                textAr: 'تم تحديث بيانات الموظف: ' + this.employees[empIndex].name,
+                textEn: 'Employee details updated: ' + this.employees[empIndex].name
+            });
+            this.save();
+        }
+    }
+
+    togglePayroll(id, month) {
+        const empIndex = this.employees.findIndex(e => e.id == id);
+        if (empIndex > -1) {
+            if (!this.employees[empIndex].paidMonths) {
+                this.employees[empIndex].paidMonths = [];
+            }
+            const idx = this.employees[empIndex].paidMonths.indexOf(month);
+            if (idx > -1) {
+                this.employees[empIndex].paidMonths.splice(idx, 1);
+            } else {
+                this.employees[empIndex].paidMonths.push(month);
+            }
+            this.save();
+        }
+    }
+
+    getEmployees() {
+        return this.employees;
+    }
+
+    addEmployee(employee) {
+        employee.id = Date.now();
+        employee.status = 'active';
+        this.employees.push(employee);
+        this.addActivity({
+            textAr: 'تمت إضافة موظف جديد: ' + employee.name,
+            textEn: 'New employee added: ' + employee.name
+        });
+        this.save();
+    }
+
+    getActivities() {
+        return this.activities.slice().reverse();
+    }
+
+    addActivity(activity) {
+        activity.id = Date.now();
+        activity.time = new Date().toISOString();
+        this.activities.push(activity);
+    }
+
+    subscribe(callback) {
+        this.listeners.push(callback);
+        // Initial call
+        callback();
+    }
+
+    getConfig() {
+        return this.config;
+    }
+
+    updateConfig(key, value) {
+        this.config[key] = value;
+        this.save();
+    }
+
+    notify() {
+        this.listeners.forEach(cb => cb());
+    }
+}
+
+const db = new LocalRealmDB();
+
+
+// --- app.js ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Auth Logic
+    const authScreen = document.getElementById('auth-screen');
+    const mainApp = document.getElementById('main-app');
+    const loginForm = document.getElementById('login-form');
+    const btnLogout = document.getElementById('btn-logout');
+
+    let currentUser = null;
+
+    function initAppForUser() {
+        authScreen.classList.remove('active');
+        mainApp.style.display = 'flex';
+
+        window.updateProfileUI = function() {
+            if (!currentUser) return;
+            const empName = currentLang === 'ar' ? currentUser.name : (currentUser.nameEn || currentUser.name);
+            document.getElementById('user-name-display').textContent = (currentLang === 'ar' ? 'مرحباً، ' : 'Welcome, ') + empName;
+            
+            // Handle role translation properly if applicable
+            let roleText = currentUser.role;
+            if (currentUser.permission === 'admin') roleText = currentLang === 'ar' ? 'مسؤول نظام' : 'System Admin';
+            else if (currentUser.permission === 'manager') roleText = currentLang === 'ar' ? 'مدير قسم' : 'Department Manager';
+            else roleText = currentLang === 'ar' ? 'موظف' : 'Employee';
+
+            document.getElementById('user-role-display').textContent = roleText;
+            
+            if (currentUser.avatar) {
+                document.getElementById('user-avatar').innerHTML = `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                document.getElementById('user-avatar').textContent = empName.charAt(0);
+            }
+        };
+        // Update topbar profile
+        window.updateProfileUI();
+
+        // Dynamic Role Based Access Control for Sidebar
+        const role = currentUser.permission || 'employee';
+        const permissions = db.getConfig().rolePermissions || {
+            admin: { dashboard: true, requests: true, employees: true, government: true, leaves: true, payroll: true, reports: true, settings: true },
+            manager: { dashboard: true, requests: true, employees: true, government: false, leaves: true, payroll: false, reports: true, settings: false },
+            employee: { dashboard: true, requests: true, employees: false, government: false, leaves: true, payroll: false, reports: true, settings: false }
+        };
+        const currentPerms = permissions[role] || permissions['employee'];
+        
+        const sections = ['dashboard', 'requests', 'employees', 'government', 'leaves', 'payroll', 'reports', 'settings'];
+        sections.forEach(sec => {
+            const btn = document.querySelector(`[data-target="${sec}"]`);
+            if (btn) {
+                btn.style.display = currentPerms[sec] ? 'flex' : 'none';
+            }
+        });
+
+        // Ensure Admin features are hidden for non-admins regardless of nav settings
+        if (role !== 'admin') {
+            const addEmpBtn = document.getElementById('btn-add-employee');
+            if(addEmpBtn) addEmpBtn.style.display = 'none';
+            const sifBtn = document.getElementById('btn-generate-sif');
+            if(sifBtn) sifBtn.style.display = 'none';
+            const adminSettings = document.getElementById('admin-settings-container');
+            if(adminSettings) adminSettings.style.display = 'none';
+        } else {
+            const addEmpBtn = document.getElementById('btn-add-employee');
+            if(addEmpBtn) addEmpBtn.style.display = 'inline-flex';
+            const sifBtn = document.getElementById('btn-generate-sif');
+            if(sifBtn) sifBtn.style.display = 'inline-flex';
+            const adminSettings = document.getElementById('admin-settings-container');
+            if(adminSettings) adminSettings.style.display = 'block';
+        }
+        
+        // Force settings button to show if the user is allowed (already handled by loop), but if they want "My profile", 
+        // they should always have access to settings. The user said: "حساب الموظف مايشوف غير طلباته صفحته التقارير اجازاته".
+        // This implies employee shouldn't see settings. But wait, we added Profile inside Settings.
+        // If settings is hidden, they can't change password. 
+        // Let's explicitly force Settings to show so they can see "My Profile", BUT hide "admin-settings-container".
+        const settingsBtn = document.querySelector('[data-target="settings"]');
+        if(settingsBtn) settingsBtn.style.display = 'flex';
+
+        // Trigger db render
+        db.notify();
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const userVal = document.getElementById('login-username').value.trim().toLowerCase();
+        const passVal = document.getElementById('login-password').value.trim();
+
+        if (userVal === 'reset' || passVal === 'reset') {
+            localStorage.clear();
+            alert('تم إعادة ضبط النظام وحذف البيانات القديمة بنجاح. سيتم تحديث الصفحة.');
+            location.reload();
+            return;
+        }
+
+        const user = db.getEmployees().find(emp => emp.username === userVal && emp.password === passVal);
+        if (user) {
+            currentUser = user;
+            initAppForUser();
+        } else {
+            alert(getTranslation('login_error'));
+        }
+    });
+
+    // Admin creates new user
+    const createUserForm = document.getElementById('create-user-form');
+    if (createUserForm) {
+        createUserForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newEmployee = {
+                name: document.getElementById('new-user-name').value,
+                nameEn: document.getElementById('new-user-name').value,
+                username: document.getElementById('new-user-username').value,
+                password: document.getElementById('new-user-password').value,
+                role: document.getElementById('new-user-role').value === 'admin' ? 'HR Manager' : 'Employee',
+                department: 'HR',
+                permission: document.getElementById('new-user-role').value,
+                managerId: null
+            };
+            db.addEmployee(newEmployee);
+            document.getElementById('create-user-form').reset();
+            alert(currentLang === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully');
+        });
+    }
+
+    // User updates their own profile
+    const personalSettingsForm = document.getElementById('personal-settings-form');
+    if (personalSettingsForm) {
+        personalSettingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newPic = document.getElementById('my-profile-pic').value;
+            const newPass = document.getElementById('my-new-password').value;
+            
+            let details = {};
+            if (newPic) details.avatar = newPic;
+            if (newPass) details.password = newPass;
+
+            if (Object.keys(details).length > 0) {
+                db.updateEmployeeDetails(currentUser.id, details);
+                // Update currentUser reference
+                currentUser = { ...currentUser, ...details };
+                window.updateProfileUI();
+                alert(currentLang === 'ar' ? 'تم تحديث البيانات بنجاح' : 'Profile updated successfully');
+                document.getElementById('personal-settings-form').reset();
+            }
+        });
+    }
+
+    btnLogout.addEventListener('click', () => {
+        currentUser = null;
+        mainApp.style.display = 'none';
+        authScreen.classList.add('active');
+        loginForm.reset();
+    });
+
+    document.addEventListener('languageChanged', () => {
+        if (window.updateProfileUI) window.updateProfileUI();
+    });
+
+    // Add Department
+    document.getElementById('dept-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const deptName = document.getElementById('new-dept-name').value;
+        db.addDepartment({ nameAr: deptName, nameEn: deptName });
+        document.getElementById('dept-form').reset();
+    });
+
+    // Navigation
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const contentAreas = document.querySelectorAll('.content-area');
+    const pageTitle = document.getElementById('page-title');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navBtns.forEach(b => b.classList.remove('active'));
+            contentAreas.forEach(c => c.classList.remove('active'));
+
+            btn.classList.add('active');
+
+            const target = btn.getAttribute('data-target');
+            const targetContent = document.getElementById('content-' + target);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            const i18nSpan = btn.querySelector('[data-i18n]');
+            if (i18nSpan) {
+                const i18nKey = i18nSpan.getAttribute('data-i18n');
+                pageTitle.setAttribute('data-i18n', i18nKey);
+                if (typeof getTranslation === 'function') {
+                    pageTitle.textContent = getTranslation(i18nKey);
+                } else {
+                    pageTitle.textContent = i18nSpan.textContent;
+                }
+            }
+        });
+    });
+
+    // Employee Modal
+    const modal = document.getElementById('employee-modal');
+    const btnAddEmployee = document.getElementById('btn-add-employee');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const employeeForm = document.getElementById('employee-form');
+    const empManagerSelect = document.getElementById('emp-manager');
+
+    btnAddEmployee.addEventListener('click', () => {
+        // Populate manager dropdown
+        empManagerSelect.innerHTML = `<option value="" data-i18n="no_manager">${getTranslation('no_manager')}</option>`;
+        db.getEmployees().forEach(emp => {
+            const empName = currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name);
+            const option = document.createElement('option');
+            option.value = emp.id;
+            option.textContent = empName;
+            empManagerSelect.appendChild(option);
+        });
+
+        // Populate department dropdown dynamically
+        const empDeptSelect = document.getElementById('emp-dept');
+        empDeptSelect.innerHTML = '';
+        db.getDepartments().forEach(dept => {
+            const deptName = currentLang === 'ar' ? dept.nameAr : dept.nameEn;
+            const option = document.createElement('option');
+            option.value = dept.id;
+            option.textContent = deptName;
+            empDeptSelect.appendChild(option);
+        });
+
+        modal.classList.add('active');
+    });
+
+    btnCloseModal.addEventListener('click', () => {
+        modal.classList.remove('active');
+        employeeForm.reset();
+    });
+
+    // Handle Form Submit
+    employeeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const newEmployee = {
+            name: document.getElementById('emp-name').value,
+            nameEn: document.getElementById('emp-name').value, // Normally we'd ask for both
+            role: document.getElementById('emp-role').value,
+            department: document.getElementById('emp-dept').value,
+            permission: document.getElementById('emp-permission').value,
+            managerId: document.getElementById('emp-manager').value || null
+        };
+
+        db.addEmployee(newEmployee);
+        
+        modal.classList.remove('active');
+        employeeForm.reset();
+    });
+
+        // Data Binding
+    db.subscribe(() => {
+        const employees = db.getEmployees();
+        const activities = db.getActivities();
+        const departments = db.getDepartments();
+
+        // Update KPI
+        document.getElementById('kpi-employees-count').textContent = employees.length;
+
+        // Update Employee Table
+        const employeeList = document.getElementById('employee-list');
+        const settingsEmployeeList = document.getElementById('settings-employee-list');
+        employeeList.innerHTML = '';
+        settingsEmployeeList.innerHTML = '';
+
+        employees.forEach(emp => {
+            const tr = document.createElement('tr');
+            
+            const empName = currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name);
+            
+            // Resolve department name dynamically
+            const deptObj = departments.find(d => d.id === emp.department);
+            const deptName = deptObj ? (currentLang === 'ar' ? deptObj.nameAr : deptObj.nameEn) : emp.department;
+
+            const permKey = 'perm_' + (emp.permission || 'employee');
+            
+            // Find manager name
+            let managerName = getTranslation('no_manager');
+            if (emp.managerId) {
+                const manager = employees.find(e => e.id == emp.managerId);
+                if (manager) {
+                    managerName = currentLang === 'ar' ? manager.name : (manager.nameEn || manager.name);
+                }
+            }
+
+            tr.innerHTML = `
+                <td>${empName}</td>
+                <td>${emp.role}</td>
+                <td>${deptName}</td>
+                <td data-i18n="${permKey}">${getTranslation(permKey)}</td>
+                <td>${managerName}</td>
+                <td><span class="status-badge status-active" data-i18n="status_active">${getTranslation('status_active')}</span></td>
+            `;
+            tr.style.cursor = 'pointer';
+            tr.title = currentLang === 'ar' ? 'انقر لعرض/تعديل التفاصيل' : 'Click to view/edit details';
+            tr.onclick = () => window.openEmployeeDetails(emp.id);
+            employeeList.appendChild(tr);
+
+            // Settings employee table
+            const trSettings = document.createElement('tr');
+            trSettings.innerHTML = `
+                <td>${empName}</td>
+                <td>
+                    <select onchange="window.updateEmpPerm(${emp.id}, this.value)" class="search-input" style="width: auto; padding: 4px 12px; font-size: 18px;">
+                        <option value="admin" ${emp.permission === 'admin' ? 'selected' : ''}>${getTranslation('perm_admin')}</option>
+                        <option value="manager" ${emp.permission === 'manager' ? 'selected' : ''}>${getTranslation('perm_manager')}</option>
+                        <option value="employee" ${emp.permission === 'employee' ? 'selected' : ''}>${getTranslation('perm_employee')}</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="window.deleteEmp(${emp.id})" class="btn-secondary" style="padding: 4px 12px; font-size: 16px; color: red;">${getTranslation('btn_delete')}</button>
+                </td>
+            `;
+            settingsEmployeeList.appendChild(trSettings);
+        });
+
+        // Update Job Positions Table
+        const positionsList = document.getElementById('positions-list');
+        if (positionsList) {
+            positionsList.innerHTML = '';
+            const rolesCount = {};
+            employees.forEach(emp => {
+                const role = emp.role && emp.role.trim() !== '' ? emp.role : (currentLang === 'ar' ? 'غير محدد' : 'Unspecified');
+                rolesCount[role] = (rolesCount[role] || 0) + 1;
+            });
+            Object.entries(rolesCount).forEach(([role, count]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${role}</td>
+                    <td><span class="status-badge status-active" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color);">${count}</span></td>
+                `;
+                positionsList.appendChild(tr);
+            });
+        }
+
+        // Update Payroll Table
+        const payrollList = document.getElementById('payroll-list');
+        if (payrollList) {
+            payrollList.innerHTML = '';
+            
+            const date = new Date();
+            const year = date.getFullYear();
+
+            employees.forEach(emp => {
+                const tr = document.createElement('tr');
+                const empName = currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name);
+                
+                let html = `<td style="white-space: nowrap;">${empName}</td>`;
+                
+                for (let i = 1; i <= 12; i++) {
+                    const monthStr = `${year}-${String(i).padStart(2, '0')}`;
+                    
+                    let isBeforeStart = false;
+                    if (emp.startDate) {
+                        const startObj = new Date(emp.startDate);
+                        if (!isNaN(startObj)) {
+                            const startYear = startObj.getFullYear();
+                            const startMonth = startObj.getMonth() + 1;
+                            if (year < startYear || (year === startYear && i < startMonth)) {
+                                isBeforeStart = true;
+                            }
+                        }
+                    }
+
+                    if (isBeforeStart) {
+                        html += `<td style="text-align: center; color: #94a3b8; font-size: 14px;">-</td>`;
+                    } else {
+                        const isPaid = emp.paidMonths && emp.paidMonths.includes(monthStr);
+                        if (isPaid) {
+                            html += `<td style="text-align: center;">
+                                <button onclick="window.togglePayroll(${emp.id}, '${monthStr}')" class="btn-secondary" style="padding: 4px; font-size: 12px; min-width: 32px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;" title="${getTranslation('mark_unpaid')}">✔️</button>
+                            </td>`;
+                        } else {
+                            html += `<td style="text-align: center;">
+                                <button onclick="window.togglePayroll(${emp.id}, '${monthStr}')" class="btn-primary" style="padding: 4px; font-size: 11px; min-width: 38px; border-radius: 4px; cursor: pointer; display: inline-flex; justify-content: center; align-items: center;" title="${getTranslation('mark_paid')}">${getTranslation('mark_paid').split(' ')[0]}</button>
+                            </td>`;
+                        }
+                    }
+                }
+
+                tr.innerHTML = html;
+                payrollList.appendChild(tr);
+            });
+        }
+
+        // Update Departments Table
+        const deptList = document.getElementById('dept-list');
+        deptList.innerHTML = '';
+        departments.forEach(dept => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${currentLang === 'ar' ? dept.nameAr : dept.nameEn}</td>
+                <td>
+                    <button onclick="window.deleteDept('${dept.id}')" class="btn-secondary" style="padding: 4px 12px; font-size: 16px; color: red;">${getTranslation('btn_delete')}</button>
+                </td>
+            `;
+            deptList.appendChild(tr);
+        });
+
+        // Update Users List
+        const usersList = document.getElementById('users-list');
+        if (usersList) {
+            usersList.innerHTML = '';
+            employees.forEach(emp => {
+                if (emp.username) {
+                    const tr = document.createElement('tr');
+                    let roleText = emp.permission;
+                    if (emp.permission === 'admin') roleText = currentLang === 'ar' ? 'مسؤول (Admin)' : 'Admin';
+                    else if (emp.permission === 'manager') roleText = currentLang === 'ar' ? 'مدير قسم (Manager)' : 'Manager';
+                    else roleText = currentLang === 'ar' ? 'موظف (Employee)' : 'Employee';
+
+                    tr.innerHTML = `
+                        <td>${currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name)}</td>
+                        <td>${emp.username}</td>
+                        <td>${roleText}</td>
+                    `;
+                    usersList.appendChild(tr);
+                }
+            });
+        }
+
+        // Update Charts
+        if (window.Chart) {
+            const ctxSalary = document.getElementById('salaryChart');
+            const ctxDept = document.getElementById('deptChart');
+
+            if (ctxSalary && ctxDept) {
+                const depts = {};
+                employees.forEach(emp => {
+                    const dObj = departments.find(d => d.id === emp.department);
+                    const dName = dObj ? (currentLang === 'ar' ? dObj.nameAr : dObj.nameEn) : emp.department;
+                    depts[dName] = (depts[dName] || 0) + 1;
+                });
+
+                if (window.salaryChartInstance) window.salaryChartInstance.destroy();
+                if (window.deptChartInstance) window.deptChartInstance.destroy();
+
+                window.salaryChartInstance = new Chart(ctxSalary, {
+                    type: 'bar',
+                    data: {
+                        labels: currentLang === 'ar' ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو'] : ['Jan','Feb','Mar','Apr','May','Jun'],
+                        datasets: [{
+                            label: currentLang === 'ar' ? 'الرواتب المصروفة (آلاف)' : 'Paid Salaries (Thousands)',
+                            data: [120, 125, 125, 130, 135, 140],
+                            backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                            borderRadius: 12
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                window.deptChartInstance = new Chart(ctxDept, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(depts),
+                        datasets: [{
+                            data: Object.values(depts),
+                            backgroundColor: ['#0ea5e9', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+                });
+            }
+        }
+
+        // Apply Config
+        const config = db.getConfig();
+        const toggleEl = (selector, show) => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.style.display = show ? '' : 'none';
+            });
+        };
+
+        toggleEl('[data-target="content-payroll"]', config.payroll);
+        toggleEl('[data-target="content-leaves"]', config.leaves);
+        toggleEl('#btn-add-employee', config.addEmp);
+        toggleEl('#btn-generate-sif', config.exportSif);
+        toggleEl('.kpi-grid', config.dashboardKpi);
+
+        // Update checkbox states
+        if (document.getElementById('cfg-payroll')) document.getElementById('cfg-payroll').checked = config.payroll;
+        if (document.getElementById('cfg-leaves')) document.getElementById('cfg-leaves').checked = config.leaves;
+        if (document.getElementById('cfg-add-emp')) document.getElementById('cfg-add-emp').checked = config.addEmp;
+        if (document.getElementById('cfg-export')) document.getElementById('cfg-export').checked = config.exportSif;
+        if (document.getElementById('cfg-dashboard-kpi')) document.getElementById('cfg-dashboard-kpi').checked = config.dashboardKpi;
+
+        // Render Role Permissions Setup
+        const rpContainer = document.getElementById('role-permissions-container');
+        if (rpContainer) {
+            rpContainer.innerHTML = '';
+            const sections = [
+                {id: 'dashboard', ar: 'الرئيسية'}, {id: 'requests', ar: 'الطلبات'}, 
+                {id: 'employees', ar: 'الموظفين'}, {id: 'government', ar: 'العلاقات الحكومية'}, 
+                {id: 'leaves', ar: 'الحضور والإجازات'}, {id: 'payroll', ar: 'الرواتب'}, 
+                {id: 'reports', ar: 'التقارير'}
+            ];
+            const roles = [{id: 'admin', ar: 'مسؤول نظام'}, {id: 'manager', ar: 'مدير قسم'}, {id: 'employee', ar: 'موظف'}];
+            
+            roles.forEach(r => {
+                let html = `<div class="card" style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.5);">
+                    <h4 style="margin-bottom: 16px;">صلاحيات: ${r.ar}</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">`;
+                
+                sections.forEach(sec => {
+                    const isChecked = config.rolePermissions && config.rolePermissions[r.id] && config.rolePermissions[r.id][sec.id];
+                    html += `
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" class="rp-checkbox" data-role="${r.id}" data-sec="${sec.id}" ${isChecked ? 'checked' : ''} style="width: 18px; height: 18px;">
+                            ${sec.ar}
+                        </label>
+                    `;
+                });
+                
+                html += `</div></div>`;
+                rpContainer.innerHTML += html;
+            });
+        }
+
+        applyTranslations(); // Re-apply for dynamic content
+    });
+
+    // Global action handlers for settings
+    window.togglePayroll = function(id, month) {
+        db.togglePayroll(id, month);
+    };
+
+    window.deleteEmp = function(id) {
+        if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا الموظف؟' : 'Are you sure you want to delete this employee?')) {
+            db.deleteEmployee(id);
+        }
+    };
+
+    window.deleteDept = function(id) {
+        if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا القسم؟' : 'Are you sure you want to delete this department?')) {
+            db.deleteDepartment(id);
+        }
+    };
+
+    window.updateEmpPerm = function(id, newPerm) {
+        db.updateEmployeePermission(id, newPerm);
+    };
+
+    // Save Role Permissions Action
+    const saveRpBtn = document.getElementById('save-role-permissions');
+    if (saveRpBtn) {
+        saveRpBtn.addEventListener('click', () => {
+            const config = db.getConfig();
+            const checkboxes = document.querySelectorAll('.rp-checkbox');
+            if (!config.rolePermissions) config.rolePermissions = {};
+            checkboxes.forEach(cb => {
+                const role = cb.getAttribute('data-role');
+                const sec = cb.getAttribute('data-sec');
+                if (!config.rolePermissions[role]) config.rolePermissions[role] = {};
+                config.rolePermissions[role][sec] = cb.checked;
+            });
+            // Force settings to always be true for everyone so they can access Profile
+            if(!config.rolePermissions['admin']) config.rolePermissions['admin'] = {};
+            if(!config.rolePermissions['manager']) config.rolePermissions['manager'] = {};
+            if(!config.rolePermissions['employee']) config.rolePermissions['employee'] = {};
+            
+            config.rolePermissions['admin']['settings'] = true;
+            config.rolePermissions['manager']['settings'] = true;
+            config.rolePermissions['employee']['settings'] = true;
+            
+            db.config = config;
+            db.save();
+            alert(currentLang === 'ar' ? 'تم حفظ صلاحيات الوصول بنجاح' : 'Role permissions saved successfully');
+            
+            // Re-apply for current user
+            initAppForUser();
+        });
+    }
+
+    // Generate SIF Action
+    document.getElementById('btn-generate-sif').addEventListener('click', () => {
+        alert(currentLang === 'ar' ? 'تم إنشاء ملف حماية الأجور (SIF) بنجاح!' : 'WPS SIF File Generated Successfully!');
+    });
+
+    // Request Leave Action
+    const btnRequestLeave = document.querySelector('#content-leaves .btn-primary');
+    if (btnRequestLeave) {
+        btnRequestLeave.addEventListener('click', () => {
+            alert(currentLang === 'ar' ? 'سيتم تفعيل ميزة طلب الإجازة قريباً!' : 'Request leave feature will be available soon!');
+        });
+    }
+
+    // Employee Details Logic
+    const detailsModal = document.getElementById('employee-details-modal');
+    const detailsForm = document.getElementById('employee-details-form');
+    
+    if (detailsModal && detailsForm) {
+        document.getElementById('btn-close-details').addEventListener('click', () => {
+            detailsModal.classList.remove('active');
+        });
+
+        document.getElementById('btn-cancel-details').addEventListener('click', () => {
+            detailsModal.classList.remove('active');
+        });
+
+        // Tabs Logic
+        const tabBtns = detailsModal.querySelectorAll('.tab-btn');
+        const tabContents = detailsModal.querySelectorAll('.tab-content');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+
+        window.openEmployeeDetails = function(empId) {
+            const emp = db.getEmployees().find(e => e.id == empId);
+            if (!emp) return;
+
+            document.getElementById('details-emp-name').textContent = currentLang === 'ar' ? emp.name : (emp.nameEn || emp.name);
+            document.getElementById('detail-emp-id').value = emp.id;
+
+            // Populate Depts & Managers
+            const deptSelect = document.getElementById('det-department');
+            deptSelect.innerHTML = '';
+            db.getDepartments().forEach(d => {
+                deptSelect.innerHTML += `<option value="${d.id}" ${d.id === emp.department ? 'selected' : ''}>${currentLang === 'ar' ? d.nameAr : d.nameEn}</option>`;
+            });
+
+            const mgrSelect = document.getElementById('det-manager');
+            mgrSelect.innerHTML = `<option value="">${getTranslation('no_manager')}</option>`;
+            db.getEmployees().filter(e => e.id != emp.id).forEach(m => {
+                mgrSelect.innerHTML += `<option value="${m.id}" ${m.id == emp.managerId ? 'selected' : ''}>${currentLang === 'ar' ? m.name : (m.nameEn || m.name)}</option>`;
+            });
+
+            // Populate Fields
+            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField'];
+            fields.forEach(f => {
+                const el = document.getElementById('det-' + f.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`));
+                if (el) el.value = emp[f] || '';
+            });
+
+            // Ensure default tab is open
+            tabBtns[0].click();
+
+            detailsModal.classList.add('active');
+        };
+
+        detailsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const empId = document.getElementById('detail-emp-id').value;
+            const details = {};
+            const fields = ['startDate', 'role', 'workLocation', 'email', 'phone', 'bank', 'legalName', 'gender', 'birthDate', 'birthPlace', 'nationality', 'nationalId', 'passport', 'visa', 'workPermit', 'street1', 'street2', 'city', 'state', 'country', 'zip', 'distance', 'emName', 'emPhone', 'marital', 'children', 'educationLevel', 'educationField'];
+            
+            details.department = document.getElementById('det-department').value;
+            details.managerId = document.getElementById('det-manager').value || null;
+
+            fields.forEach(f => {
+                const el = document.getElementById('det-' + f.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`));
+                if (el) details[f] = el.value;
+            });
+
+            db.updateEmployeeDetails(empId, details);
+            detailsModal.classList.remove('active');
+            
+            // Refresh UI implicitly
+            db.notify();
+        });
+    }
+
+    // System Config Event Listeners
+    const configMap = {
+        'cfg-payroll': 'payroll',
+        'cfg-leaves': 'leaves',
+        'cfg-add-emp': 'addEmp',
+        'cfg-export': 'exportSif',
+        'cfg-dashboard-kpi': 'dashboardKpi'
+    };
+
+    Object.keys(configMap).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.addEventListener('change', (e) => {
+                db.updateConfig(configMap[id], e.target.checked);
+            });
+        }
+    });
+});
+
+</script>
 </body>
 </html>
