@@ -35,7 +35,8 @@
     </div>
 
     <div class="app-container" style="display: none;" id="main-app">
-        <aside class="sidebar">
+        <div id="mobile-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9; transition: var(--transition);"></div>
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="app-logo">
                     <img src="logo.png" alt="Next Dimension Logo" />
@@ -83,7 +84,10 @@
 
         <main class="main-content">
             <header class="topbar">
-                <h1 id="page-title" data-i18n="nav_dashboard">لوحة القيادة (النسخة المحدثة)</h1>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button id="mobile-menu-btn" class="btn-icon" style="display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main);">☰</button>
+                    <h1 id="page-title" data-i18n="nav_dashboard">لوحة القيادة (النسخة المحدثة)</h1>
+                </div>
                 <div class="topbar-actions">
                     <div class="user-profile">
                         <div class="avatar-squircle" id="user-avatar">م</div>
@@ -623,12 +627,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-
-
-
-
-<script>
+    <script type="module" src="js/supabase-init.js"></script><script>
 // --- i18n.js ---
 const translations = {
     ar: {
@@ -876,6 +875,67 @@ class LocalRealmDB {
             this.config = { payroll: true, leaves: true, addEmp: true, exportSif: true, dashboardKpi: true };
         }
         this.listeners = [];
+        
+        // البدء بمزامنة البيانات مع Supabase
+        this.syncWithSupabase();
+    }
+
+    async syncWithSupabase() {
+        // انتظار حتى يتم تحميل عميل Supabase
+        while (!window.supabaseClient) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+        
+        try {
+            const { data, error } = await window.supabaseClient.from('app_storage').select('*');
+            if (error) throw error;
+            
+            if (data && data.length > 0) {
+                // جلب البيانات من السحابة وتحديث المتغيرات المحلية
+                const empData = data.find(d => d.key === 'hrms_employees');
+                if (empData) this.employees = empData.value;
+                
+                const deptData = data.find(d => d.key === 'hrms_departments');
+                if (deptData) this.departments = deptData.value;
+                
+                const actData = data.find(d => d.key === 'hrms_activities');
+                if (actData) this.activities = actData.value;
+                
+                const confData = data.find(d => d.key === 'hrms_config');
+                if (confData) this.config = confData.value;
+                
+                // تحديث LocalStorage بالبيانات السحابية الجديدة
+                localStorage.setItem('hrms_employees', JSON.stringify(this.employees));
+                localStorage.setItem('hrms_departments', JSON.stringify(this.departments));
+                localStorage.setItem('hrms_activities', JSON.stringify(this.activities));
+                localStorage.setItem('hrms_config', JSON.stringify(this.config));
+                
+                this.notify(); // تحديث واجهة المستخدم
+            } else {
+                // إذا كانت السحابة فارغة، قم برفع البيانات المحلية إليها
+                this.pushToSupabase();
+            }
+        } catch(e) {
+            console.error('Error syncing with Supabase:', e);
+        }
+    }
+
+    async pushToSupabase() {
+        if (!window.supabaseClient) return;
+        
+        const payload = [
+            { key: 'hrms_employees', value: this.employees },
+            { key: 'hrms_departments', value: this.departments },
+            { key: 'hrms_activities', value: this.activities },
+            { key: 'hrms_config', value: this.config }
+        ];
+        
+        try {
+            const { error } = await window.supabaseClient.from('app_storage').upsert(payload);
+            if (error) console.error('Supabase save error:', error);
+        } catch(e) {
+             console.error('Supabase push error:', e);
+        }
     }
 
     save() {
@@ -883,6 +943,10 @@ class LocalRealmDB {
         localStorage.setItem('hrms_activities', JSON.stringify(this.activities));
         localStorage.setItem('hrms_departments', JSON.stringify(this.departments));
         localStorage.setItem('hrms_config', JSON.stringify(this.config));
+        
+        // رفع البيانات الجديدة إلى السحابة في الخلفية
+        this.pushToSupabase();
+        
         this.notify();
     }
 
@@ -1200,8 +1264,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     pageTitle.textContent = i18nSpan.textContent;
                 }
             }
+
+            // Close sidebar on mobile after clicking
+            const sidebar = document.getElementById('sidebar');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            if (sidebar) sidebar.classList.remove('open');
+            if (mobileOverlay) mobileOverlay.style.display = 'none';
         });
     });
+
+    // Mobile Sidebar Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (mobileMenuBtn && sidebar && mobileOverlay) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            mobileOverlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        });
+
+        mobileOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            mobileOverlay.style.display = 'none';
+        });
+    }
 
     // Employee Modal
     const modal = document.getElementById('employee-modal');
